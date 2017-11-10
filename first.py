@@ -12,12 +12,14 @@ class simpleapp_wx(wx.Frame):
 			self.initialize()
 
 		def initialize(self):
+			#TextBox
 			sizer = wx.GridBagSizer()
 			self.entry = wx.TextCtrl(self,-1,value=u"Enter name.")
 			sizer.Add(self.entry,(0,0),(1,1),wx.EXPAND)
 			self.entry2 = wx.TextCtrl(self,-1,value=u"Enter email address.")
 			sizer.Add(self.entry2,(1,0),(2,2),wx.EXPAND)
-			self.Bind(wx.EVT_TEXT_ENTER, self.OnPressEnter, self.entry)
+			self.entry3 = wx.TextCtrl(self,-1,value=u"Enter user id")
+			sizer.Add(self.entry3,(1,8),(1,9),wx.EXPAND)
 
 			#Button
 			button = wx.Button(self,-1,label="Insert")
@@ -27,15 +29,15 @@ class simpleapp_wx(wx.Frame):
 
 			button2 = wx.Button(self,-1,label="Delete")
 			sizer.Add(button2, (5,0))
-			self.Bind(wx.EVT_BUTTON, self.OnButtonClick, button2)
+			self.Bind(wx.EVT_BUTTON, self.OnButtonClickDelete, button2)
 
 			button3 = wx.Button(self,-1,label="Find")
 			sizer.Add(button3, (6,0))
-			self.Bind(wx.EVT_BUTTON, self.OnButtonClick, button3)
+			self.Bind(wx.EVT_BUTTON, self.OnButtonClickFind, button3)
 
 			button4 = wx.Button(self,-1,label="Update")
 			sizer.Add(button4, (7,0))
-			self.Bind(wx.EVT_BUTTON, self.OnButtonClick, button4)
+			self.Bind(wx.EVT_BUTTON, self.OnButtonClickUpdate, button4)
 
 			self.label = wx.StaticText(self,-1,label=u'Hello !')
 			self.label.SetBackgroundColour(wx.BLUE)
@@ -48,12 +50,6 @@ class simpleapp_wx(wx.Frame):
 			self.entry.SetSelection(-1,-1)
 			self.Show(True)
 
-
-	
-		def OnPressEnter(self,event):
-			self.label.SetLabel(self.entry.GetValue())
-			self.entry.SetFocus()
-			self.entry.SetSelection(-1,-1)
 
 			
 		try:
@@ -93,6 +89,48 @@ class simpleapp_wx(wx.Frame):
 			  	print(err)
 			  	cur.close()
 			  	cnx.close()
+
+		def OnButtonClickDelete(self,event):
+			print("Delete")
+			user_id = (int(self.entry3.GetValue()))
+			print(user_id)
+			try:
+				query = "DELETE FROM users WHERE id = '%d'" % (user_id)
+				cnx = mysql.connector.connect(user = 'root', password = '',host = '127.0.0.1', database = 'testingdatabase')
+				cursor = cnx.cursor()
+				cursor.execute(query)
+				cnx.commit()
+			except Error as e:
+					print(e)
+			finally:
+					cursor.close()
+					cnx.close()
+
+		def OnButtonClickUpdate(self,event):
+			print("Update the User")
+		def OnButtonClickFind(self,event):
+			print("Find")
+
+
+			try:
+				cnx = mysql.connector.connect(user = 'root', password = '',host = '127.0.0.1', database = 'testingdatabase')
+				cursor = cnx.cursor()
+				cursor.execute("SELECT * FROM users")
+
+				rows = cursor.fetchall()
+
+				print('Total Row(s):', cursor.rowcount)
+
+				print(rows[3])
+				'''for row in rows:
+					print(row)'''
+
+			except Error as e:
+					print(e)
+			finally:
+					cursor.close()
+					cnx.close()
+
 
 if __name__ == "__main__":
     app = wx.App()
